@@ -1,10 +1,13 @@
 package com.xlogisticzz.woodGenerator.client.interfaces.container;
 
+import com.xlogisticzz.woodGenerator.client.interfaces.slots.SlotBoneMeal;
+import com.xlogisticzz.woodGenerator.client.interfaces.slots.SlotWood;
 import com.xlogisticzz.woodGenerator.tileEntities.TileWoodGenerator;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.inventory.Container;
 import net.minecraft.inventory.ICrafting;
+import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
 
 /**
@@ -14,10 +17,30 @@ import net.minecraft.item.ItemStack;
 
 public class ContainerWoodGenerator extends Container {
 
-    TileWoodGenerator woodGenerator;
+    private TileWoodGenerator woodGenerator;
 
     public ContainerWoodGenerator(InventoryPlayer inventoryPlayer, TileWoodGenerator woodGenerator) {
         this.woodGenerator = woodGenerator;
+
+        // Player Hotbar
+        for (int x = 0; x < 9; x++) {
+            addSlotToContainer(new Slot(inventoryPlayer, x, 8 + 18 * x, 194));
+        }
+
+        // Player Inventory
+        for (int y = 0; y < 3; y++) {
+            for (int x = 0; x < 9; x++) {
+                addSlotToContainer(new Slot(inventoryPlayer, x + y * 9 + 9, 8 + 18 * x, 136 + y * 18));
+            }
+        }
+
+        for (int y = 0; y < 3; y++) {
+            for (int x = 0; x < 3; x++) {
+                addSlotToContainer(new SlotWood(woodGenerator, x + y * 3, 115 + 18 * x, 17 + y * 18));
+            }
+        }
+
+        addSlotToContainer(new SlotBoneMeal(woodGenerator, 9, 26, 35));
 
     }
 
@@ -28,7 +51,7 @@ public class ContainerWoodGenerator extends Container {
 
     @Override
     public ItemStack transferStackInSlot(EntityPlayer par1EntityPlayer, int par2) {
-        return super.transferStackInSlot(par1EntityPlayer, par2);
+        return null;
     }
 
     @Override

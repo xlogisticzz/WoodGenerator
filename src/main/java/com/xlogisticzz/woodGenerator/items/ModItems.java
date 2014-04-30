@@ -7,12 +7,12 @@ package com.xlogisticzz.woodGenerator.items;
 
 public class ModItems {
 
-    public static void init(){
+    public static void init() {
 
         register();
     }
 
-    public static void register(){
+    public static void register() {
 
     }
 }

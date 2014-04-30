@@ -22,13 +22,11 @@ import cpw.mods.fml.common.event.FMLServerStartingEvent;
 @Mod(modid = Constants.MODID, name = Constants.MODID, version = Constants.VERSION)
 public class WoodGenerator {
 
-    PacketPipeline packetPipeline = new PacketPipeline();
-
     @Mod.Instance(Constants.MODID)
     public static WoodGenerator instance;
-
     @SidedProxy(clientSide = Constants.CLIENT, serverSide = Constants.COMMON)
     public static CommonProxy proxy;
+    PacketPipeline packetPipeline = new PacketPipeline();
 
     @Mod.EventHandler
     public void PreInt(FMLPreInitializationEvent event) {

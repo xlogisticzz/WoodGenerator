@@ -1,13 +1,14 @@
 package com.xlogisticzz.woodGenerator.client.interfaces.gui;
 
-import com.xlogisticzz.woodGenerator.lib.Constants;
 import com.xlogisticzz.woodGenerator.client.interfaces.container.ContainerWoodGenerator;
+import com.xlogisticzz.woodGenerator.lib.Constants;
 import com.xlogisticzz.woodGenerator.tileEntities.TileWoodGenerator;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.inventory.GuiContainer;
-
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.util.ResourceLocation;
+import org.lwjgl.opengl.GL11;
 
 /**
  * @author xLoGisTicZz
@@ -16,10 +17,15 @@ import net.minecraft.util.ResourceLocation;
 
 public class GuiWoodGenerator extends GuiContainer {
 
-    private static final ResourceLocation texture = new ResourceLocation(Constants.MODID, "textures/gui/woodGenerator.png");
+    private static final ResourceLocation texture = new ResourceLocation(Constants.MODID.toLowerCase(), "textures/gui/woodGenerator.png");
+    private TileWoodGenerator woodGenerator;
 
     public GuiWoodGenerator(InventoryPlayer inventoryPlayer, TileWoodGenerator woodGenerator) {
         super(new ContainerWoodGenerator(inventoryPlayer, woodGenerator));
+        this.woodGenerator = woodGenerator;
+
+        xSize = 176;
+        ySize = 218;
     }
 
     @Override
@@ -28,6 +34,9 @@ public class GuiWoodGenerator extends GuiContainer {
 
     @Override
     protected void drawGuiContainerBackgroundLayer(float f, int x, int y) {
+        GL11.glColor4f(1, 1, 1, 1);
+        Minecraft.getMinecraft().getTextureManager().bindTexture(texture);
+        drawTexturedModalRect(guiLeft, guiTop, 0, 0, xSize, ySize);
     }
 
     @Override
