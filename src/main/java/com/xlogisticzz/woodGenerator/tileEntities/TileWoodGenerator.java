@@ -5,6 +5,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.inventory.IInventory;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
@@ -19,10 +20,91 @@ public class TileWoodGenerator extends TileEntity implements IInventory {
 
     private ItemStack[] items;
     private String customName;
+    private int delay;
+    private int timer;
+    private int timerMax;
+    private Block currentBlock;
+    private int currentMeta;
 
     public TileWoodGenerator() {
         items = new ItemStack[10];
+        currentBlock = Blocks.log;
+        currentMeta = 0;
+        timerMax = 48;
 
+
+    }
+
+    @Override
+    public void updateEntity() {
+        if (!worldObj.isRemote) {
+            updateWoodType();
+            setTimerMax();
+            if (++delay == 5) {
+                System.out.print(timer);
+                if (++timer >= timerMax) {
+                    generateWood();
+                    timer = 0;
+                }
+                delay = 0;
+            }
+        }
+    }
+
+    private void generateWood() {
+        for (int i = 0; i < items.length - 1; i++) {
+            if (canInsert(items[i], currentBlock, currentMeta)) {
+                if (items[i] != null) {
+                    items[i].stackSize++;
+                    timerMax = 48;
+                    System.out.println("generate");
+                    return;
+                }
+                items[i] = new ItemStack(currentBlock, 1, currentMeta);
+                timerMax = 48;
+                System.out.println("generate");
+                return;
+            }
+        }
+    }
+
+    private void updateWoodType() {
+        blockMetadata = worldObj.getBlockMetadata(xCoord, yCoord, zCoord);
+        if (blockMetadata > 3) {
+            currentBlock = Blocks.log2;
+            currentMeta = blockMetadata - 4;
+        } else {
+            currentBlock = Blocks.log;
+            currentMeta = blockMetadata;
+        }
+    }
+
+    public void setTimerMax() {
+        if (items[9] != null && timerMax != 6) {
+            if (items[9].getItem() == Items.dye || items[9].getItemDamage() == 15) {
+                if (items[9].stackSize < 2) {
+                    items[9] = null;
+                    timerMax = 6;
+                    return;
+                } else {
+                    items[9].stackSize--;
+                    timerMax = 6;
+                }
+            } else {
+                timerMax = 48;
+            }
+        }
+    }
+
+
+    private boolean canInsert(ItemStack item, Block block, int meta) {
+        if (item == null) {
+            return true;
+        }
+        if (item.getItem() == Item.getItemFromBlock(block) && item.getItemDamage() == meta && item.stackSize < item.getMaxStackSize()) {
+            return true;
+        }
+        return false;
     }
 
     @Override
@@ -39,6 +121,15 @@ public class TileWoodGenerator extends TileEntity implements IInventory {
                 setInventorySlotContents(slot, ItemStack.loadItemStackFromNBT(item));
             }
         }
+
+        if (compound.hasKey("CustomName", 8)) {
+            customName = compound.getString("CustomName");
+        }
+
+        timer = compound.getByte("Timer");
+        timerMax = compound.getByte("TimerMax");
+        currentBlock = Block.getBlockById(compound.getInteger("CurrentBlock"));
+        currentMeta = compound.getByte("CurrentMeta");
     }
 
     @Override
@@ -57,6 +148,16 @@ public class TileWoodGenerator extends TileEntity implements IInventory {
             }
         }
         compound.setTag("Items", items);
+        compound.setByte("Timer", (byte) timer);
+        compound.setByte("TimerMax", (byte) timerMax);
+        compound.setInteger("CurrentBlock", Block.getIdFromBlock(currentBlock));
+        compound.setByte("CurrentMeta", (byte) currentMeta);
+
+
+        if (hasCustomInventoryName()) {
+            compound.setString("CustomName", this.customName);
+        }
+
     }
 
     @Override

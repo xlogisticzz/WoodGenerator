@@ -74,6 +74,13 @@ public class BlockWoodGenerator extends BlockContainer {
     public boolean onBlockActivated(World world, int x, int y, int z, EntityPlayer player, int side, float hitX, float hitY, float hitZ) {
         if (!world.isRemote && !player.isSneaking()) {
             FMLNetworkHandler.openGui(player, WoodGenerator.instance, 0, world, x, y, z);
+        } else if (!world.isRemote && player.isSneaking()) {
+            int meta = world.getBlockMetadata(x, y, z);
+            if (meta > 4) {
+                world.setBlockMetadataWithNotify(x, y, z, 0, 3);
+            } else {
+                world.setBlockMetadataWithNotify(x, y, z, meta + 1, 3);
+            }
         }
         return true;
     }
