@@ -2,13 +2,17 @@ package com.xlogisticzz.woodGenerator.client.interfaces.gui;
 
 import com.xlogisticzz.woodGenerator.client.interfaces.container.ContainerWoodGenerator;
 import com.xlogisticzz.woodGenerator.lib.Constants;
+import com.xlogisticzz.woodGenerator.network.PacketGuiWoodGenerator;
+import com.xlogisticzz.woodGenerator.network.PacketPipeline;
 import com.xlogisticzz.woodGenerator.tileEntities.TileWoodGenerator;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiButton;
+import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.util.ResourceLocation;
 import org.lwjgl.opengl.GL11;
+
+import java.util.List;
 
 /**
  * @author xLoGisTicZz
@@ -18,7 +22,9 @@ import org.lwjgl.opengl.GL11;
 public class GuiWoodGenerator extends GuiContainer {
 
     private static final ResourceLocation texture = new ResourceLocation(Constants.MODID.toLowerCase(), "textures/gui/woodGenerator.png");
+    private final GuiTabBase[] tabs;
     private TileWoodGenerator woodGenerator;
+    private GuiTabBase activeTab;
 
     public GuiWoodGenerator(InventoryPlayer inventoryPlayer, TileWoodGenerator woodGenerator) {
         super(new ContainerWoodGenerator(inventoryPlayer, woodGenerator));
@@ -26,10 +32,25 @@ public class GuiWoodGenerator extends GuiContainer {
 
         xSize = 176;
         ySize = 218;
+        tabs = new GuiTabBase[]{
+                new GuiTabSapling("Oak", 0, woodGenerator.getWorldObj()),
+                new GuiTabSapling("Spruce", 1, woodGenerator.getWorldObj()),
+                new GuiTabSapling("Birch", 2, woodGenerator.getWorldObj()),
+                new GuiTabSapling("Jungle", 3, woodGenerator.getWorldObj()),
+                new GuiTabSapling("Acacia", 4, woodGenerator.getWorldObj()),
+                new GuiTabSapling("Dark oak", 5, 58, 55, woodGenerator.getWorldObj())
+        };
+        woodGenerator.updateWoodType();
+        activeTab = tabs[woodGenerator.getType()];
     }
 
     @Override
     protected void drawGuiContainerForegroundLayer(int x, int y) {
+        activeTab.drawForeground(this, x, y);
+
+        for (GuiTab tab : tabs) {
+            tab.drawHoverText(this, x, y, tab.getName());
+        }
     }
 
     @Override
@@ -37,30 +58,70 @@ public class GuiWoodGenerator extends GuiContainer {
         GL11.glColor4f(1, 1, 1, 1);
         Minecraft.getMinecraft().getTextureManager().bindTexture(texture);
         drawTexturedModalRect(guiLeft, guiTop, 0, 0, xSize, ySize);
+
+        for (GuiTab tab : tabs) {
+            int srcY = 18;
+            if (tab == activeTab) {
+                srcY += 28;
+            } else if (tab.inRect(this, x, y)) {
+                srcY += 14;
+            }
+            tab.draw(this, xSize, srcY);
+        }
+        activeTab.drawBackground(this, x, y);
     }
 
     @Override
     public void initGui() {
         super.initGui();
+
+        activeTab = tabs[woodGenerator.getType()];
     }
 
     @Override
-    protected void actionPerformed(GuiButton p_146284_1_) {
-        super.actionPerformed(p_146284_1_);
+    protected void mouseClicked(int x, int y, int button) {
+        super.mouseClicked(x, y, button);
+
+        for (GuiTabBase tab : tabs) {
+            if (activeTab != tab) {
+                if (tab.inRect(this, x, y)) {
+                    activeTab = tab;
+                    woodGenerator.getWorldObj().setBlockMetadataWithNotify(woodGenerator.xCoord, woodGenerator.yCoord, woodGenerator.zCoord, activeTab.id, 2);
+                    PacketPipeline.sendToServer(new PacketGuiWoodGenerator(activeTab.id, woodGenerator.xCoord, woodGenerator.yCoord, woodGenerator.zCoord));
+                }
+            }
+        }
+        activeTab.mouseClick(this, x, y, button);
+
     }
 
     @Override
-    protected void mouseClicked(int par1, int par2, int par3) {
-        super.mouseClicked(par1, par2, par3);
+    protected void mouseClickMove(int x, int y, int button, long timeSinceClick) {
+        super.mouseClickMove(x, y, button, timeSinceClick);
+
+        activeTab.mouseMovedClick(this, x, y, button, timeSinceClick);
     }
 
     @Override
-    protected void mouseClickMove(int p_146273_1_, int p_146273_2_, int p_146273_3_, long p_146273_4_) {
-        super.mouseClickMove(p_146273_1_, p_146273_2_, p_146273_3_, p_146273_4_);
+    protected void mouseMovedOrUp(int x, int y, int button) {
+        super.mouseMovedOrUp(x, y, button);
+        activeTab.mouseReleased(this, x, y, button);
     }
 
-    @Override
-    protected void mouseMovedOrUp(int p_146286_1_, int p_146286_2_, int p_146286_3_) {
-        super.mouseMovedOrUp(p_146286_1_, p_146286_2_, p_146286_3_);
+
+    public int getLeft() {
+        return guiLeft;
+    }
+
+    public int getTop() {
+        return guiTop;
+    }
+
+    public FontRenderer getFontRenderer(){
+        return fontRendererObj;
+    }
+
+    public void drawHoverString(List list, int x, int y) {
+        drawHoveringText(list, x, y, fontRendererObj);
     }
 }

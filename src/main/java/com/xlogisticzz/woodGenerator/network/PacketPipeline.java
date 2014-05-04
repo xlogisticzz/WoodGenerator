@@ -70,6 +70,7 @@ public class PacketPipeline extends MessageToMessageCodec<FMLProxyPacket, Packet
     }
 
     public void registerPackets() {
+        registerPacket(PacketGuiWoodGenerator.class);
     }
 
     @Override

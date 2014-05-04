@@ -17,7 +17,7 @@ import net.minecraft.item.ItemStack;
 
 public class ContainerWoodGenerator extends Container {
 
-    private TileWoodGenerator woodGenerator;
+    public TileWoodGenerator woodGenerator;
 
     public ContainerWoodGenerator(InventoryPlayer inventoryPlayer, TileWoodGenerator woodGenerator) {
         this.woodGenerator = woodGenerator;
@@ -57,15 +57,21 @@ public class ContainerWoodGenerator extends Container {
     @Override
     public void addCraftingToCrafters(ICrafting par1ICrafting) {
         super.addCraftingToCrafters(par1ICrafting);
+        par1ICrafting.sendProgressBarUpdate(this, 0, woodGenerator.getBlockMetadata());
     }
 
     @Override
-    public void updateProgressBar(int par1, int par2) {
-        super.updateProgressBar(par1, par2);
+    public void updateProgressBar(int id, int data) {
+        if (id == 0) {
+            woodGenerator.getWorldObj().setBlockMetadataWithNotify(woodGenerator.xCoord, woodGenerator.yCoord, woodGenerator.zCoord, data, 2);
+        }
     }
 
     @Override
     public void detectAndSendChanges() {
         super.detectAndSendChanges();
+        for (Object player : crafters) {
+            ((ICrafting) player).sendProgressBarUpdate(this, 0, woodGenerator.getBlockMetadata());
+        }
     }
 }

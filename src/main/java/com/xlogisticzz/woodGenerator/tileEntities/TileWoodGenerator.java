@@ -32,16 +32,18 @@ public class TileWoodGenerator extends TileEntity implements IInventory {
         currentMeta = 0;
         timerMax = 48;
 
+    }
 
+    public int getType() {
+        return getBlockMetadata();
     }
 
     @Override
     public void updateEntity() {
         if (!worldObj.isRemote) {
-            updateWoodType();
             setTimerMax();
+            updateWoodType();
             if (++delay == 5) {
-                System.out.print(timer);
                 if (++timer >= timerMax) {
                     generateWood();
                     timer = 0;
@@ -52,30 +54,29 @@ public class TileWoodGenerator extends TileEntity implements IInventory {
     }
 
     private void generateWood() {
+        updateWoodType();
         for (int i = 0; i < items.length - 1; i++) {
             if (canInsert(items[i], currentBlock, currentMeta)) {
                 if (items[i] != null) {
                     items[i].stackSize++;
                     timerMax = 48;
-                    System.out.println("generate");
                     return;
                 }
                 items[i] = new ItemStack(currentBlock, 1, currentMeta);
                 timerMax = 48;
-                System.out.println("generate");
                 return;
             }
         }
     }
 
-    private void updateWoodType() {
-        blockMetadata = worldObj.getBlockMetadata(xCoord, yCoord, zCoord);
-        if (blockMetadata > 3) {
+    public void updateWoodType() {
+        int meta = worldObj.getBlockMetadata(xCoord, yCoord, zCoord);
+        if (meta > 3) {
             currentBlock = Blocks.log2;
-            currentMeta = blockMetadata - 4;
+            currentMeta = meta - 4;
         } else {
             currentBlock = Blocks.log;
-            currentMeta = blockMetadata;
+            currentMeta = meta;
         }
     }
 
