@@ -31,6 +31,7 @@ public class TileWoodGenerator extends TileEntity implements IInventory {
         currentBlock = Blocks.log;
         currentMeta = 0;
         timerMax = 48;
+        timer = 0;
 
     }
 
@@ -51,6 +52,22 @@ public class TileWoodGenerator extends TileEntity implements IInventory {
                 delay = 0;
             }
         }
+    }
+
+    public int getTimer() {
+        return timer;
+    }
+
+    public void setTimer(int timer) {
+        this.timer = timer;
+    }
+
+    public int getTimerMax() {
+        return timerMax;
+    }
+
+    public void setTimerMax(int timerMax) {
+        this.timerMax = timerMax;
     }
 
     private void generateWood() {
@@ -96,7 +113,6 @@ public class TileWoodGenerator extends TileEntity implements IInventory {
             }
         }
     }
-
 
     private boolean canInsert(ItemStack item, Block block, int meta) {
         if (item == null) {

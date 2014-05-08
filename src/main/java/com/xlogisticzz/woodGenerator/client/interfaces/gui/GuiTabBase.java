@@ -142,8 +142,8 @@ public abstract class GuiTabBase extends GuiTab {
 
 
     @Override
-    public void drawForeground(GuiWoodGenerator gui, int x, int y){
-        if(!Minecraft.isFancyGraphicsEnabled()){
+    public void drawForeground(GuiWoodGenerator gui, int x, int y) {
+        if (!Minecraft.isFancyGraphicsEnabled()) {
             GuiUtils.drawCenteredString(gui.getFontRenderer(), "Turn on fancy graphics", 112, 74, 0x404040);
         }
     }

@@ -18,6 +18,9 @@ import net.minecraft.item.ItemStack;
 public class ContainerWoodGenerator extends Container {
 
     public TileWoodGenerator woodGenerator;
+    private int oldTimer;
+    private int oldMeta;
+    private int oldTimerMax;
 
     public ContainerWoodGenerator(InventoryPlayer inventoryPlayer, TileWoodGenerator woodGenerator) {
         this.woodGenerator = woodGenerator;
@@ -55,15 +58,21 @@ public class ContainerWoodGenerator extends Container {
     }
 
     @Override
-    public void addCraftingToCrafters(ICrafting par1ICrafting) {
-        super.addCraftingToCrafters(par1ICrafting);
-        par1ICrafting.sendProgressBarUpdate(this, 0, woodGenerator.getBlockMetadata());
+    public void addCraftingToCrafters(ICrafting player) {
+        super.addCraftingToCrafters(player);
+        player.sendProgressBarUpdate(this, 0, woodGenerator.getBlockMetadata());
+        player.sendProgressBarUpdate(this, 1, woodGenerator.getTimer());
+        player.sendProgressBarUpdate(this, 2, woodGenerator.getTimerMax());
     }
 
     @Override
     public void updateProgressBar(int id, int data) {
         if (id == 0) {
             woodGenerator.getWorldObj().setBlockMetadataWithNotify(woodGenerator.xCoord, woodGenerator.yCoord, woodGenerator.zCoord, data, 2);
+        } else if (id == 1) {
+            woodGenerator.setTimer(data);
+        } else if (id == 2) {
+            woodGenerator.setTimerMax(data);
         }
     }
 
@@ -71,7 +80,18 @@ public class ContainerWoodGenerator extends Container {
     public void detectAndSendChanges() {
         super.detectAndSendChanges();
         for (Object player : crafters) {
-            ((ICrafting) player).sendProgressBarUpdate(this, 0, woodGenerator.getBlockMetadata());
+            if (oldMeta != woodGenerator.getBlockMetadata()) {
+                ((ICrafting) player).sendProgressBarUpdate(this, 0, woodGenerator.getBlockMetadata());
+            }
+            if (oldTimer != woodGenerator.getTimer()) {
+                ((ICrafting) player).sendProgressBarUpdate(this, 1, woodGenerator.getTimer());
+            }
+            if (oldTimerMax != woodGenerator.getTimerMax()) {
+                ((ICrafting) player).sendProgressBarUpdate(this, 2, woodGenerator.getTimerMax());
+            }
         }
+        oldMeta = woodGenerator.getType();
+        oldTimer = woodGenerator.getTimer();
+        oldTimerMax = woodGenerator.getTimerMax();
     }
 }

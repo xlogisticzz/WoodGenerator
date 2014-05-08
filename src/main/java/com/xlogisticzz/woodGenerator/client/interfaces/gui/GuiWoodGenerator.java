@@ -5,6 +5,7 @@ import com.xlogisticzz.woodGenerator.lib.Constants;
 import com.xlogisticzz.woodGenerator.network.PacketGuiWoodGenerator;
 import com.xlogisticzz.woodGenerator.network.PacketPipeline;
 import com.xlogisticzz.woodGenerator.tileEntities.TileWoodGenerator;
+import com.xlogisticzz.woodGenerator.utils.StringUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.inventory.GuiContainer;
@@ -48,6 +49,9 @@ public class GuiWoodGenerator extends GuiContainer {
     protected void drawGuiContainerForegroundLayer(int x, int y) {
         activeTab.drawForeground(this, x, y);
 
+        String title = StringUtils.localize("tile.woodGenerator.name");
+        fontRendererObj.drawString(title, 8, 6, 0x404040);
+
         for (GuiTab tab : tabs) {
             tab.drawHoverText(this, x, y, tab.getName());
         }
@@ -59,6 +63,11 @@ public class GuiWoodGenerator extends GuiContainer {
         Minecraft.getMinecraft().getTextureManager().bindTexture(texture);
         drawTexturedModalRect(guiLeft, guiTop, 0, 0, xSize, ySize);
 
+        double timerWidth = ((double) woodGenerator.getTimer() / (double) woodGenerator.getTimerMax()) * 51;
+        if (timerWidth >= 0 && timerWidth <= 51) {
+            drawTexturedModalRect(guiLeft + 53, guiTop + 34, xSize, 0, (int) timerWidth, 18);
+        }
+
         for (GuiTab tab : tabs) {
             int srcY = 18;
             if (tab == activeTab) {
@@ -69,6 +78,8 @@ public class GuiWoodGenerator extends GuiContainer {
             tab.draw(this, xSize, srcY);
         }
         activeTab.drawBackground(this, x, y);
+
+
     }
 
     @Override
@@ -117,7 +128,7 @@ public class GuiWoodGenerator extends GuiContainer {
         return guiTop;
     }
 
-    public FontRenderer getFontRenderer(){
+    public FontRenderer getFontRenderer() {
         return fontRendererObj;
     }
 
