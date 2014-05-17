@@ -22,7 +22,7 @@ group= "com.xlogisticzz.woodGenerator" // http://maven.apache.org/guides/mini/gu
 archivesBaseName = "woodGenerator"
 
 minecraft {
-    version = "1.7.2-10.12.1.1061"
+    version = "1.7.2-10.12.1.1082"
     assetDir = "eclipse/assets"
 }
 
