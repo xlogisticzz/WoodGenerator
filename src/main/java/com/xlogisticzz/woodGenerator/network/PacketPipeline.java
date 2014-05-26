@@ -51,7 +51,7 @@ public class PacketPipeline extends MessageToMessageCodec<FMLProxyPacket, Packet
      */
     public boolean registerPacket(Class<? extends PacketWoodGenerator> clas) {
         if (packets.size() > 256) {
-            LogHelper.error("Learning modding is attempting to register more packets than the limit. Some things may not work. " + clas.getCanonicalName());
+            LogHelper.error("Learning modding is attempting to register more packets than the limit. Some things may not work so report this to the mod author. " + clas.getCanonicalName());
             return false;
         }
 
@@ -61,7 +61,7 @@ public class PacketPipeline extends MessageToMessageCodec<FMLProxyPacket, Packet
         }
 
         if (isPostInit) {
-            LogHelper.error("Learning Modding is attempting to register packets in the pre innit phase. Things will not work and report this to the mod author. " + clas.getCanonicalName());
+            LogHelper.error("Learning Modding is attempting to register packets in the pre innit phase. Things will not work so report this to the mod author. " + clas.getCanonicalName());
             return false;
         }
 
